@@ -1,19 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
+
+interface MorgageRecord {
+    month: number;
+    initialBalance: number;
+    monthlyPayment: number;
+    interestPayment: number;
+    principalPayment: number;
+    remainingPrincipal: number;
+}
 
 function App() {
-    const getMonthlyPayment = (
-        totalLoanAmount: number,
-        loanLength: number,
-        totalInterestRate: number
-    ) => {
-        const monthlyInterestRate = totalInterestRate / 100 / 12;
-        const monthlyPayment =
-            (totalLoanAmount * monthlyInterestRate) /
-            (1 - (1 + monthlyInterestRate) ** -loanLength);
-        return monthlyPayment;
+    const [balanceSheet, setBalanceSheet] = useState<MorgageRecord[]>([]);
+
+    const calculateRemainingLoan = (
+        principal: number,
+        annualInterestRate: number,
+        loanDurationInMonths: number
+    ): void => {
+        let monthlyInterestRate = annualInterestRate / 12 / 100;
+        let monthlyPayment =
+            (principal * monthlyInterestRate) /
+            (1 - Math.pow(1 + monthlyInterestRate, -loanDurationInMonths));
+
+        let remainingPrincipal = principal;
+        const tempBalanceSheet = [];
+
+        for (let month = 1; month <= loanDurationInMonths; month++) {
+            let interestPayment = remainingPrincipal * monthlyInterestRate;
+            let principalPayment = monthlyPayment - interestPayment;
+            // remainingPrincipal -= principalPayment;
+
+            tempBalanceSheet.push({
+                month,
+                initialBalance: remainingPrincipal,
+                monthlyPayment: monthlyPayment,
+                interestPayment: interestPayment,
+                principalPayment: principalPayment,
+                remainingPrincipal: (remainingPrincipal -= principalPayment),
+            });
+
+            console.log(
+                `Month ${month}: Remaining principal is $${remainingPrincipal.toFixed(
+                    2
+                )}`
+            );
+        }
+
+        setBalanceSheet(tempBalanceSheet);
     };
 
     const handleFormSubmit = (event: any) => {
@@ -25,13 +61,17 @@ function App() {
 
         const time = new Date();
 
-        const monthlyPayment = getMonthlyPayment(
+        const monthlyPayment = calculateRemainingLoan(
             totalLoanAmount,
-            loanLength,
-            totalInterestRate
+            totalInterestRate,
+            loanLength
         );
 
         console.log(monthlyPayment);
+    };
+
+    const R = (x: number | string) => {
+        return Number(x).toFixed(2);
     };
 
     return (
@@ -75,7 +115,34 @@ function App() {
                 </Col>
 
                 <Col>
-                    <div>Col 2</div>
+                    {balanceSheet.length > 0 ? (
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Initial Balance</th>
+                                    <th>Monthly Payment</th>
+                                    <th>Interest Payment</th>
+                                    <th>Principal Payment</th>
+                                    <th>Remaining Principal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {balanceSheet.map((row) => (
+                                    <tr key={row.month}>
+                                        <td>{row.month}</td>
+                                        <td>{R(row.initialBalance)}</td>
+                                        <td>{R(row.monthlyPayment)}</td>
+                                        <td>{R(row.interestPayment)}</td>
+                                        <td>{R(row.principalPayment)}</td>
+                                        <td>{R(row.remainingPrincipal)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        <p>Submit form to see balance sheet</p>
+                    )}
                 </Col>
             </Row>
         </Container>
