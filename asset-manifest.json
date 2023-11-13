@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/morgage-calc/static/css/main.62d3213f.css",
+    "main.js": "/morgage-calc/static/js/main.1bbd1ae6.js",
+    "static/js/787.4d5bbb1e.chunk.js": "/morgage-calc/static/js/787.4d5bbb1e.chunk.js",
+    "index.html": "/morgage-calc/index.html",
+    "main.62d3213f.css.map": "/morgage-calc/static/css/main.62d3213f.css.map",
+    "main.1bbd1ae6.js.map": "/morgage-calc/static/js/main.1bbd1ae6.js.map",
+    "787.4d5bbb1e.chunk.js.map": "/morgage-calc/static/js/787.4d5bbb1e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.62d3213f.css",
+    "static/js/main.1bbd1ae6.js"
+  ]
+}
